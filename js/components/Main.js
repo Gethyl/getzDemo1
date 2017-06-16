@@ -27,12 +27,26 @@ export default class Main extends Component {
     constructor(props:any) {
         super(props)
         this.state = {
-            loggedIn : this.loginOrlogoff()
+            loggedIn : false
+
         }
 
         this.loginAuth0 = this.loginAuth0.bind(this)
         this.loginOrlogoff = this.loginOrlogoff.bind(this)
         this.logoffAuth0 = this.logoffAuth0.bind(this)
+    }
+    componentWillMount(){
+        AsyncStorage.getItem('idToken').then(v=>{
+            console.log('idToken is ===> ' + v)
+            return !!v?this.setState({loggedIn:true}):this.setState({loggedIn:false})
+        })
+    }
+
+    componentDidUpdate(){
+        // AsyncStorage.getItem('idToken').then(v=>{
+        //     console.log('idToken is ===> ' + v)
+        //     return !!v?this.setState({loggedIn:true}):this.setState({loggedIn:false})
+        // })
     }
 
     loginAuth0() {
@@ -48,6 +62,7 @@ export default class Main extends Component {
             console.log(token)
             try {
                 await AsyncStorage.setItem('idToken', token.idToken);
+                debugger
                 this.setState({loggedIn:!!token.idToken})
             }
             catch (error) {
