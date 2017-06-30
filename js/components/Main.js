@@ -40,17 +40,8 @@ export default class Main extends Component {
 
     componentWillMount(){
         AsyncStorage.multiGet(['idToken','profile']).then(v=>{
-            console.info('JSON Parsing v value')
-            console.dir(JSON.parse(v[1][1]))
-            return !!v?this.setState({loggedIn:true, userProfile:JSON.parse(v[1][1])}):this.setState({loggedIn:false, userProfile:{}})
+            return !!(v[0][1])?this.setState({loggedIn:true, userProfile:JSON.parse(v[1][1])}):this.setState({loggedIn:false, userProfile:{}})
         })
-    }
-
-    componentDidUpdate(){
-        // AsyncStorage.getItem('idToken').then(v=>{
-        //     console.log('idToken is ===> ' + v)
-        //     return !!v?this.setState({loggedIn:true}):this.setState({loggedIn:false})
-        // })
     }
 
     loginAuth0() {
@@ -79,18 +70,16 @@ export default class Main extends Component {
 
     async loginOrlogoff ()  {
         const idToken = await AsyncStorage.getItem('idToken')
-        // this.setState({loggedIn:!!idToken})
-        console.log(`${idToken} and the Bool value ${!!idToken}`)
         return !!idToken
     }
 
     async logoffAuth0() {
-        await AsyncStorage.removeItem('idToken')
+        await AsyncStorage.multiRemove(['idToken','profile'])
         this.setState({ loggedIn: false })
         Alert.alert('Logging off', 'idToken removed from AsyncStorage')
     }
     render(){
-        console.dir(this.state.userProfile)
+
         return !this.state.loggedIn ? 
          (
             <View style={styles.container}>
@@ -111,19 +100,21 @@ export default class Main extends Component {
         :
         (
             <View style={styles.container}>
-                <View>
-                    <Text style={styles.welcome}>
-                        Hello {this.state.userProfile.nickname}
-                    </Text>
+                {!! this.state.userProfile && 
+                    <View>                    
+                        <Text style={styles.welcome}>
+                            Hello {this.state.userProfile.nickname}
+                        </Text>
 
-                    <View style={{display:'flex',flexDirection:'row', backgroundColor:'rgba(220,220,220, 0.8)', justifyContent:'center'}}>
-                        <Image
-                            style={{width: 200, height: 200, }}
-                            source={{uri: this.state.userProfile.picture}}
-                        />
+                        <View style={{display:'flex',flexDirection:'row', backgroundColor:'rgba(220,220,220, 0.8)', justifyContent:'center'}}>
+                            <Image
+                                style={{width: 200, height: 200, }}
+                                source={{uri: this.state.userProfile.picture}}
+                            />
+                        </View>
+                        
                     </View>
-                    
-                </View>
+                }
 
                 <View style={styles.footerItem}>
                     <Button title="Logoff" onPress={this.logoffAuth0} color='green'></Button>
@@ -139,6 +130,7 @@ let styles = StyleSheet.create({
             flex: 1,
             flexDirection:'column',
             width:800,
+            
         },
         welcome: {
             fontSize: 20,

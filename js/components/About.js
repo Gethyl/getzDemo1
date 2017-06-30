@@ -37,7 +37,7 @@ const About = (props:any) => {
                 About View
             </Text>
             <Text style={styles.instructions}>
-                This view doesn't check for authentication
+                This view doesn't check for authentication, but this helps you see how react-router 4 is used for a basic navigation
             </Text>
         </View>
     )
